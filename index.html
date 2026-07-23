@@ -6,6 +6,15 @@
   <title>Kléo — Your First Financial Identity</title>
   <meta name="description" content="Kléo turns a simple saving habit into a real, official credit score and a portable Financial Passport — for the millions the credit system can't see." />
 
+  <!-- Google tag (gtag.js) — GA4 measurement. Hard-coded so Google's tag detector sees it. -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-645WMZPJLK"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-645WMZPJLK');
+  </script>
+
   <!-- ============================================================
        KLÉO LANDING PAGE — single file, no build step.
        Content is real (from the team canvas/BMC); numbers marked
@@ -383,7 +392,8 @@
     track(name, props={}){
       const ev = { name, ...props, ts:new Date().toISOString(), path:location.pathname };
       this.events.push(ev); this.save();
-      if(window.gtag){ gtag('event', name, props); }
+      // GA4 already auto-sends page_view via the <head> config; only forward custom events.
+      if(window.gtag && name!=='page_view'){ gtag('event', name, props); }
       console.log("[Kléo track]", name, props);
     },
     showAdmin(){ this.render(); document.getElementById('admin').classList.add('show'); },
@@ -425,12 +435,8 @@
 
   Analytics.load();
 
-  if(CONFIG.GA4_ID){
-    const s=document.createElement('script'); s.async=true;
-    s.src="https://www.googletagmanager.com/gtag/js?id="+CONFIG.GA4_ID; document.head.appendChild(s);
-    window.dataLayer=window.dataLayer||[]; window.gtag=function(){dataLayer.push(arguments);};
-    gtag('js', new Date()); gtag('config', CONFIG.GA4_ID);
-  }
+  // GA4 (gtag) is loaded by the hard-coded snippet in <head>, which also auto-sends
+  // the page_view. We only forward custom events (clicks, signups) — see track() below.
 
   Analytics.track('page_view', { ref: document.referrer || 'direct' });
 
